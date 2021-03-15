@@ -12,6 +12,10 @@ enum GenreValue {
     case femelle
 }
 
+enum AnimalError: Error{
+    case WrongGenre
+}
+
 class Animal{
     var name: String
     var age: Int
@@ -46,22 +50,23 @@ class Animal{
         self.zoo?.removeAnimal(a: self)
     }
     
-    func mettreBas() -> Animal?{
-        if self.genre == GenreValue.femelle{
+    func mettreBas()throws -> Animal?{
+            if self.genre == GenreValue.male{
+                throw AnimalError.WrongGenre
+            }
             let gI = Int.random(in: 1...2)
             var bebe = Animal(name: self.name+" petit", genre: gI == 1 ? GenreValue.femelle : GenreValue.male, kind: self.kind)
             zoo?.addAnimal(a: bebe)
             return bebe
-        }else{
-            print("ouppsss.... pas possible")
-            return nil
-        }
     }
 }
 
 class Zoo{
     var animaux : [Animal] = []
     var rescencement = [String:Int]()
+    subscript(index: Int) -> Animal {
+        return animaux[index]
+    }
     
     func addAnimal(a: Animal?){
         animaux.append(a!);
@@ -100,9 +105,14 @@ mickey = Animal(name: "mickey", age: 7, genre: GenreValue.male, kind: "souris")
 var monZoo = Zoo()
 monZoo.addAnimal(a: minie)
 monZoo.addAnimal(a: mickey)
-minie!.mettreBas()
+do{
+    try minie!.mettreBas()
+    print("minie a mis bas")
+}catch AnimalError.WrongGenre{
+    print("un male ne peut pas mettre bas")
+}
 print(monZoo.rescencement)
 mickey!.mourir()
 mickey = nil
 print(monZoo.rescencement)
-
+print(monZoo[0])
